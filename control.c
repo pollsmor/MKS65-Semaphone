@@ -6,9 +6,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define SEMKEY 24602
-#define SHMKEY 24603
+#define SEMKEY 732841
+#define SHMKEY 732842
 #define SEG_SIZE 1000
+
+union semun {
+  int              val;    /* Value for SETVAL */
+  struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+  unsigned short  *array;  /* Array for GETALL, SETALL */
+  struct seminfo  *__buf;  /* Buffer for IPC_INFO
+                              (Linux-specific) */
+};
 
 int main(int argc, char *argv[]) {
   if (argc > 1) {
@@ -33,6 +41,7 @@ int main(int argc, char *argv[]) {
       fd = open("story.txt", O_RDONLY);
       char story[SEG_SIZE];
       read(fd, story, SEG_SIZE);
+      printf("The story so far: \n");
       printf("%s", story);
       close(fd);
 
@@ -40,7 +49,17 @@ int main(int argc, char *argv[]) {
     }
 
     else if (strcmp(argv[1], "-r") == 0) {
+      shmd = shmget(SHMKEY, 0, 0);
+      semd = semget(SEMKEY, 1, 0);
 
+      shmctl(shmd, IPC_RMID, 0);
+      printf("shared memory removed \n");
+
+      remove("story.txt");
+      printf("file removed \n");
+
+      semctl(semd, IPC_RMID, 0);
+      printf("semaphore removed \n");
 
       return 0;
     }
