@@ -21,11 +21,14 @@ union semun {
 int main(int argc, char *argv[]) {
   if (argc > 1) {
     int semd;
+    union semun us;
     int shmd;
     int fd;
 
     if (strcmp(argv[1], "-c") == 0) {
       semd = semget(SEMKEY, 1, IPC_CREAT | IPC_EXCL | 0644);
+      us.val = 1;
+      semctl(semd, 0, SETVAL, us); //this and the above line set the initial amount of connections open to 1
       printf("semaphore created \n");
 
       shmd = shmget(SHMKEY, SEG_SIZE, IPC_CREAT | IPC_EXCL | 0644);
@@ -51,6 +54,7 @@ int main(int argc, char *argv[]) {
     else if (strcmp(argv[1], "-r") == 0) {
       shmd = shmget(SHMKEY, 0, 0);
       semd = semget(SEMKEY, 1, 0);
+      while (semctl(semd, 0, GETVAL, us) == 0);
 
       shmctl(shmd, IPC_RMID, 0);
       printf("shared memory removed \n");
