@@ -31,27 +31,31 @@ int main() {
   printf("trying to get in \n");
   while (semctl(semd, 0, GETVAL, us) == 0);
 
-  us.val = 0;
-  semctl(semd, 0, SETVAL, us); //take over the connection so no other programs can use it
+  struct sembuf sb;
+  sb.sem_num = 0;
+  sb.sem_op = -1;
+  semop(semd, &sb, 1); //take over the connection so no other programs can use it
 
   char last_addition[*last_line_size + 1];
   fd = open("story.txt", O_RDONLY);
   lseek(fd, -1 * sizeof(int) * *last_line_size, SEEK_END);
+  printf("Bytes read: %d \n", sizeof(int) * *last_line_size);
   read(fd, last_addition, sizeof(int) * *last_line_size);
 
   printf("Last addition: %s \n", last_addition);
 
   printf("Your addition: ");
-  char addition[50];
+  char addition[100];
   fgets(addition, sizeof(addition), stdin);
+  addition[strlen(addition) -1] = '\0'; //strip the newline at the end
   int len = strlen(addition);
   fd = open("story.txt", O_WRONLY | O_APPEND);
   write(fd, addition, sizeof(int) * len);
   *last_line_size = strlen(addition);
   printf("The story file has now been updated. \n");
 
-  us.val = 1;
-  semctl(semd, 0, SETVAL, us); //release the connection
+  sb.sem_op = 1;
+  semop(semd, &sb, 1); //release the connection
 
   return 0;
 }
