@@ -38,9 +38,9 @@ int main() {
 
   char last_addition[*last_line_size + 1];
   fd = open("story.txt", O_RDONLY);
-  lseek(fd, -1 * sizeof(int) * *last_line_size, SEEK_END);
-  printf("Bytes read: %d \n", sizeof(int) * *last_line_size);
-  read(fd, last_addition, sizeof(int) * *last_line_size);
+  lseek(fd, -1 * *last_line_size, SEEK_END);
+  printf("Bytes read: %d \n", *last_line_size);
+  read(fd, last_addition, *last_line_size);
 
   printf("Last addition: %s \n", last_addition);
 
@@ -50,7 +50,7 @@ int main() {
   addition[strlen(addition) -1] = '\0'; //strip the newline at the end
   int len = strlen(addition);
   fd = open("story.txt", O_WRONLY | O_APPEND);
-  write(fd, addition, sizeof(int) * len);
+  write(fd, addition, len);
   *last_line_size = strlen(addition);
   printf("The story file has now been updated. \n");
 
