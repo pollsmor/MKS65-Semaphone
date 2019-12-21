@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <unistd.h>
@@ -26,27 +25,27 @@ int main() {
 
   semd = semget(SEMKEY, 1, 0);
   printf("trying to get in \n");
-  while (semctl(semd, 0, GETVAL, us) == 0);
+  while (semctl(semd, 0, GETVAL, us) == 0); //block until GETVAL returns 1
 
   shmd = shmget(SHMKEY, 0, 0);
   last_line_size = shmat(shmd, 0, 0);
 
-  struct sembuf sb;
+  struct sembuf sb; //for atomic up and down operations
   sb.sem_num = 0;
   sb.sem_op = -1;
   semop(semd, &sb, 1); //take over the connection so no other programs can use it
 
-  char last_addition[*last_line_size + 1];
+  char last_addition[*last_line_size];
   fd = open("story.txt", O_RDONLY);
-  lseek(fd, -1 * *last_line_size, SEEK_END);
+  lseek(fd, -1 * *last_line_size, SEEK_END); //move back this many bytes from the end of the file
   //printf("Bytes read: %d \n", *last_line_size);
   read(fd, last_addition, *last_line_size);
-  last_addition[*last_line_size] = '\0';
+  last_addition[*last_line_size] = '\0'; //random stuff appears if empty.
 
   printf("Last addition: %s \n", last_addition);
 
   printf("Your addition: ");
-  char addition[100];
+  char addition[200];
   fgets(addition, sizeof(addition), stdin);
   int len = strlen(addition);
   fd = open("story.txt", O_WRONLY | O_APPEND);
