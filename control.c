@@ -43,9 +43,10 @@ int main(int argc, char *argv[]) {
     else if (strcmp(argv[1], "-v") == 0) {
       fd = open("story.txt", O_RDONLY);
       char story[SEG_SIZE];
-      story[0] = '\0'; //empty the array
+      story[0] = '\0';
       read(fd, story, SEG_SIZE);
-      story[strlen(story)] = '\0'; //empty anything else after the story
+      if (strlen(story) != 0)
+        *(strrchr(story, '\n') + 1) = '\0';
       printf("The story so far: \n");
       printf("%s", story);
       close(fd);
@@ -54,10 +55,11 @@ int main(int argc, char *argv[]) {
     }
 
     else if (strcmp(argv[1], "-r") == 0) {
-      shmd = shmget(SHMKEY, 0, 0);
       semd = semget(SEMKEY, 1, 0);
+      printf("trying to get in \n");
       while (semctl(semd, 0, GETVAL, us) == 0);
 
+      shmd = shmget(SHMKEY, 0, 0);
       shmctl(shmd, IPC_RMID, 0);
       printf("shared memory removed \n");
 

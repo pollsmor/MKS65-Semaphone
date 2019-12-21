@@ -8,7 +8,6 @@
 
 #define SEMKEY 732841
 #define SHMKEY 732842
-#define SEG_SIZE 1000
 
 union semun {
   int              val;    /* Value for SETVAL */
@@ -25,11 +24,12 @@ int main() {
   int *last_line_size;
   int fd;
 
-  shmd = shmget(SHMKEY, 0, 0);
-  last_line_size = shmat(shmd, 0, 0);
   semd = semget(SEMKEY, 1, 0);
   printf("trying to get in \n");
   while (semctl(semd, 0, GETVAL, us) == 0);
+
+  shmd = shmget(SHMKEY, 0, 0);
+  last_line_size = shmat(shmd, 0, 0);
 
   struct sembuf sb;
   sb.sem_num = 0;
