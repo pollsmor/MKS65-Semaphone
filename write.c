@@ -39,8 +39,9 @@ int main() {
   char last_addition[*last_line_size + 1];
   fd = open("story.txt", O_RDONLY);
   lseek(fd, -1 * *last_line_size, SEEK_END);
-  printf("Bytes read: %d \n", *last_line_size);
+  //printf("Bytes read: %d \n", *last_line_size);
   read(fd, last_addition, *last_line_size);
+  last_addition[*last_line_size] = '\0';
 
   printf("Last addition: %s \n", last_addition);
 
@@ -54,6 +55,7 @@ int main() {
   *last_line_size = strlen(addition);
   printf("The story file has now been updated. \n");
 
+  shmdt(last_line_size);
   sb.sem_op = 1;
   semop(semd, &sb, 1); //release the connection
 

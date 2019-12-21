@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
       semctl(semd, 0, SETVAL, us); //this and the above line set the initial amount of connections open to 1
       printf("semaphore created \n");
 
-      shmd = shmget(SHMKEY, SEG_SIZE, IPC_CREAT | IPC_EXCL | 0644);
+      shmd = shmget(SHMKEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
       printf("shared memory created \n");
 
       fd = open("story.txt", O_CREAT | O_TRUNC, 0644);
