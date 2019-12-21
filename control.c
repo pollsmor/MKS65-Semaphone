@@ -43,7 +43,9 @@ int main(int argc, char *argv[]) {
     else if (strcmp(argv[1], "-v") == 0) {
       fd = open("story.txt", O_RDONLY);
       char story[SEG_SIZE];
+      story[0] = '\0'; //empty the array
       read(fd, story, SEG_SIZE);
+      story[strlen(story)] = '\0'; //empty anything else after the story
       printf("The story so far: \n");
       printf("%s", story);
       close(fd);

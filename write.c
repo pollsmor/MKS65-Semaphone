@@ -48,7 +48,6 @@ int main() {
   printf("Your addition: ");
   char addition[100];
   fgets(addition, sizeof(addition), stdin);
-  addition[strlen(addition) -1] = '\0'; //strip the newline at the end
   int len = strlen(addition);
   fd = open("story.txt", O_WRONLY | O_APPEND);
   write(fd, addition, len);
